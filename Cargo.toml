@@ -1,6 +1,11 @@
 [package]
-name = "parser-project"
+name = "css-parser-project"
 version = "0.1.0"
 edition = "2021"
+description = "This is a parser, developed on Rust, that will take CSS code and parse it, based on adjusted rules."
 
 [dependencies]
+anyhow = "1.0.93"
+pest = "2.7.14"
+pest_derive = "2.7.14"
+regex = "1.11.1"
