@@ -1,0 +1,7 @@
+.header {
+    color: blue;
+    color: #765abc;
+    margin: 10px;
+    padding: 20px;
+}
+

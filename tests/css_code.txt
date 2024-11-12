@@ -1,6 +1,0 @@
-.header
-#headerBlock
-div
-.fa-icons
-#footer
-54dd
