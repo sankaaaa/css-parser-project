@@ -2,6 +2,7 @@
 name = "css-parser-project"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"  
 authors = ["Олександра <o.prokopchuk@ukma.edu.ua>"]
 description = "This is a parser, developed on Rust, that will take CSS code and parse it, based on adjusted rules."
 
