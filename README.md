@@ -2,7 +2,7 @@
 
 crates.io: https://crates.io/crates/css-parser-project
 
-docs.rs: https://docs.rs/css-parser-project/latest/css_parser_project/
+docs.rs: https://docs.rs/css-parser-project/0.2.0/css_parser_project/
 
 ### General description
 This is a parser program, developed on Rust, that will parse the CSS code (its structure, selectors, properties and basic values). 
