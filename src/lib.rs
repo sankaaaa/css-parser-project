@@ -1,15 +1,39 @@
-use anyhow::{anyhow, Result};
 use pest::Parser;
 use pest_derive::Parser;
+use regex::Regex;
+use thiserror::Error;
 
 #[derive(Parser)]
 #[grammar = "css-grammar.pest"]
 pub struct CSSParser;
 
+#[derive(Error, Debug)]
+pub enum CSSParseError {
+    #[error("Could not parse this selector: {0}")]
+    SelectorParse(String),
+    
+    #[error("Could not parse this property: {0}")]
+    PropertyParse(String),
+
+    #[error("Wrong hex-digit for color used: '{0}'")]
+    HexDigitParse(String),
+    
+    #[error("Wrong hex-code for color used: '{0}'")]
+    InvalidHexColor(String),
+    
+    #[error("Wrong dimension for property used: '{0}'")]
+    DimensionParse(String),
+    
+    #[error("Could not parse this CSS-block: {0}")]
+    CSSBlockParse(String),
+}
+
+type Result<T> = std::result::Result<T, CSSParseError>;
+
 pub fn parse_selector(input: &str) -> Result<String> {
     CSSParser::parse(Rule::selector, input)
         .map(|pairs| pairs.as_str().to_string())
-        .map_err(|e| anyhow!("Parsing failed for selector '{}': {}", input, e))
+        .map_err(|e| CSSParseError::SelectorParse(format!("'{}': {}", input, e)))
 }
 
 pub fn parse_property(input: &str) -> Result<String> {
@@ -19,32 +43,30 @@ pub fn parse_property(input: &str) -> Result<String> {
                 .into_iter()
                 .next()
                 .map(|pair| pair.as_str().to_string())
-                .ok_or_else(|| anyhow!("No valid property found in input: '{}'", input))
+                .ok_or_else(|| CSSParseError::PropertyParse(format!("No valid property found in '{}'", input)))
         })
-        .map_err(|e| anyhow!("Parsing failed for property '{}': {}", input, e))
         .and_then(|res| res)
 }
 
 pub fn parse_hex_color(input: &str) -> Result<String> {
-    let hex_color_regex = regex::Regex::new(r"^#([0-9A-Fa-f]{6})$").unwrap();
-
+    let hex_color_regex = Regex::new(r"^#([0-9A-Fa-f]{6})$").unwrap();
     if hex_color_regex.is_match(input) {
         Ok(format!("color: {}; ", input))
     } else {
-        Err(anyhow!("Invalid hex color code '{}'", input))
+        Err(CSSParseError::InvalidHexColor(input.to_string()))
     }
 }
 
 pub fn parse_dimension(input: &str) -> Result<String> {
     CSSParser::parse(Rule::dimension, input)
         .map(|pairs| pairs.as_str().to_string())
-        .map_err(|e| anyhow!("Parsing failed for dimension '{}': {}", input, e))
+        .map_err(|e| CSSParseError::DimensionParse(format!("'{}': {}", input, e)))
 }
 
 pub fn parse_hex_digit(input: &str) -> Result<String> {
     CSSParser::parse(Rule::hex_digit, input)
         .map(|pairs| pairs.as_str().to_string())
-        .map_err(|e| anyhow!("Parsing failed for hex digit '{}': {}", input, e))
+        .map_err(|e| CSSParseError::HexDigitParse(format!("'{}': {}", input, e)))
 }
 
 pub fn parse_css_file(input: &str) -> Result<String> {
@@ -76,7 +98,7 @@ pub fn parse_css_file(input: &str) -> Result<String> {
             }
             css_output
         })
-        .map_err(|e| anyhow!("Parsing failed for CSS file '{}': {}", input, e))
+        .map_err(|e| CSSParseError::CSSBlockParse(format!("'{}': {}", input, e)))
 }
 
 fn parse_properties(pair: pest::iterators::Pair<Rule>) -> String {
