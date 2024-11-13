@@ -3,10 +3,12 @@ use pest_derive::Parser;
 use regex::Regex;
 use thiserror::Error;
 
+/// The CSSParser struct is a parser that uses the Pest library to parse CSS code according to a predefined grammar.
 #[derive(Parser)]
 #[grammar = "css-grammar.pest"]
 pub struct CSSParser;
 
+/// The CSSParseError enum defines different error types that occur during the CSS parsing process, each carrying a String describing the specific error encountered.
 #[derive(Error, Debug)]
 pub enum CSSParseError {
     #[error("Could not parse this selector: {0}")]
