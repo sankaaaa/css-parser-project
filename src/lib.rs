@@ -38,6 +38,7 @@ pub fn parse_selector(input: &str) -> Result<String> {
 
 pub fn parse_property(input: &str) -> Result<String> {
     CSSParser::parse(Rule::property, input)
+        .map_err(|e| CSSParseError::PropertyParse(format!("'{}': {}", input, e))) 
         .map(|pairs| {
             pairs
                 .into_iter()
@@ -45,8 +46,9 @@ pub fn parse_property(input: &str) -> Result<String> {
                 .map(|pair| pair.as_str().to_string())
                 .ok_or_else(|| CSSParseError::PropertyParse(format!("No valid property found in '{}'", input)))
         })
-        .and_then(|res| res)
+        .and_then(|res| res) 
 }
+
 
 pub fn parse_hex_color(input: &str) -> Result<String> {
     let hex_color_regex = Regex::new(r"^#([0-9A-Fa-f]{6})$").unwrap();
